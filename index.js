@@ -21,7 +21,7 @@ app.use('/', ThreadRoutes);
 
 const URI = process.env.MONGO_URI
 
-mongoose.connect(URI)
+mongoose.connect(URI, { useNewUrlParser: true })
     .then(() => {
         app.listen(PORT, () => {
             console.log(`Server connected at ${PORT}`)
