@@ -9,6 +9,7 @@ const CreateUser = async (req, res) => {
     let user = await Users.create({ ...req.body, password: hashPassword })
 
     if (!user) {
+
         res.json({ status: 0, message: "Failed" })
     }
     const token = await user.generateToken()
