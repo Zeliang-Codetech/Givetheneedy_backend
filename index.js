@@ -5,6 +5,8 @@ const env = require("dotenv/config");
 const cookieParser = require("cookie-parser")
 const UserRoutes = require('./Routes/User')
 const ThreadRoutes = require('./Routes/Threads')
+const path = require('path')
+
 
 const PORT = 8000;
 
