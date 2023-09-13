@@ -1,27 +1,52 @@
 const Users = require("../Model/User");
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const sendmail = require('../SendMail')
+const sendmail = require('../SendMail');
+const multer = require("multer");
+
+const fileStorage = multer.diskStorage({
+    destination: (req, res, cb) => { //cb=callback
+        cb(null, "./Uploads")
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + "" + file.originalname)
+    }
+})
+
+const upload = multer({
+    storage: fileStorage
+}).single("image")
+
+
+
 
 const CreateUser = async (req, res) => {
-    const { password } = req.body
-    const hashPassword = await bcrypt.hash(password, 10)
-    let user = await Users.create({ ...req.body, password: hashPassword })
+    upload(req, res, async (err) => {
+        if (err) {
+            console.log(err)
+        } else {
+            let image;
+            if (req.file) {
+                console.log(req.file)
+                image = req.file.path.replace(/\\/g, "/")
+            }
+            const { password } = req.body
+            const hashPassword = await bcrypt.hash(password, 10)
+            const user = await Users.create({ ...req.body, password: hashPassword, image: image })
+            if (!user) {
+                res.json({ status: 0, message: "Failed" })
+            }
 
-    if (!user) {
+            const token = await user.generateToken()
+            const options = {
+                expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+                httpOnly: true
 
-        res.json({ status: 0, message: "Failed" })
-    }
-    const token = await user.generateToken()
+            }
+            res.cookie("token", token, options).json({ status: 1, message: "Login successful", user, token: token })
 
-    const options = {
-
-        expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
-        httpOnly: true
-
-    }
-
-    res.cookie("token", token, options).json({ status: 1, message: "Login successful", user, token: token })
+        }
+    })
 }
 
 
@@ -102,13 +127,27 @@ const getUserById = async (req, res) => {
 }
 
 const updateUserById = async (req, res) => {
+
     try {
-        const updateUser = await Users.findByIdAndUpdate(req.params.id, req.body)
-        if (!updateUser) {
-            res.json({ status: 0, message: "User is not updated" })
-            return
-        }
-        res.json({ status: 1, message: "updated" })
+        upload(req, res, async (err) => {
+            if (err) {
+                console.log(err)
+            } else {
+                let image;
+                if (req.file) {
+                    console.log(req.file)
+                    image = req.file.path.replace(/\\/g, "/")
+                }
+                console.log(req.body)
+                const updateUser = await Users.findByIdAndUpdate(req.params.id, req.body, image)
+                if (!updateUser) {
+                    res.json({ status: 0, message: "User is not updated" })
+                    return
+                }
+                res.json({ status: 1, message: "updated" })
+
+            }
+        })
     } catch (error) {
         res.json({ message: error })
     }
@@ -151,6 +190,12 @@ const resetPassword = async (req, res) => {
     }
 
 }
+const CreateMovie = async (req, res) => {
+
+
+
+};
+
 
 
 module.exports = { CreateUser, UserLogin, forgotPassword, resetPassword, getUser, getSingleUser, getUserById, deleteUserbyId, updateUserById }
