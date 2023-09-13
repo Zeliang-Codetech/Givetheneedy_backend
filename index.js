@@ -18,6 +18,7 @@ app.use(cookieParser());
 
 app.use('/', UserRoutes);
 app.use('/', ThreadRoutes);
+app.use('/Uploads', express.static(path.join(__dirname, '/Uploads')))
 
 const URI = process.env.MONGO_URI
 
