@@ -80,7 +80,7 @@ const forgotPassword = async (req, res) => {
         if (!getUser) {
             return res.status(404).json({ message: "User Doesn't Exist" });
         }
-        let token = jwt.sign({ username: getUser.username, userId: getUser._id }, process.env.SECRET, { expiresIn: "5m" })
+        let token = jwt.sign({ username: getUser.username, userId: getUser._id }, "GTN_token", { expiresIn: "5m" })
         const link = `http://localhost:3000/reset/password/${getUser._id}/${token}`
         let content = `Hi ${getUser.username} \n Your link to reset the password \n ${link} \n This will be valid only for 5 mins. \nIf you didn't request this, please ignore this email.`
         sendmail(email, "Link to reset Password", content)

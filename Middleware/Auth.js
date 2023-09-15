@@ -7,7 +7,7 @@ const authentication = async (req, res, next) => {
         // const { token } = req.cookies
 
         if (req.headers.authorization) {
-            let decode = jwt.verify(req.headers.authorization, process.env.SECRET)
+            let decode = jwt.verify(req.headers.authorization, "GTN_token")
             if (decode) {
                 req.user = await User.findById(decode._id)
                 next()
@@ -26,8 +26,8 @@ const authentication = async (req, res, next) => {
 
 module.exports = authentication
 
-     // const decoded = await jwt.verify(token, process.env.SECRET)
-        // if (decoded) {
-        //     req.user = await User.findById(decoded._id)
-        //     next()
-        // }    
+// const decoded = await jwt.verify(token, process.env.SECRET)
+// if (decoded) {
+//     req.user = await User.findById(decoded._id)
+//     next()
+// }    

@@ -16,7 +16,7 @@ userSchema.methods.matchPassword = async function (password) {
     return await bcrypt.compare(password, this.password)
 }
 userSchema.methods.generateToken = function () {
-    return jwt.sign({ _id: this._id }, process.env.SECRET)
+    return jwt.sign({ _id: this._id }, "GTN_token")
 }
 
 const Users = mongoose.model('Users', userSchema)
